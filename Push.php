@@ -72,12 +72,41 @@ class Push extends \Module
      */
     public function setCode(\Component $component, string $code): \modules\push\dtos\Code
     {
-        if (isset(self::$_codes[$component->getType() . '@' . $component->getName() . '@' . $code]) == false) {
-            self::$_codes[
-                $component->getType() . '@' . $component->getName() . '@' . $code
-            ] = new \modules\push\dtos\Code($component, $code);
+        return new \modules\push\dtos\Code($component, $code);
+    }
+
+    /**
+     * 전체알림코드를 가져온다.
+     *
+     * @return \modules\push\dtos\Code[] $codes
+     */
+    public function getCodes(): array
+    {
+        if (isset(self::$_codes) == false) {
+            self::$_codes = [];
+
+            foreach (\Modules::all() as $module) {
+                /**
+                 * @var \modules\push\Protocol $protocol
+                 */
+                $protocol = parent::getProtocol($module);
+                foreach ($protocol?->getCodes() ?? [] as $code) {
+                    self::$_codes[$code->getCode(true)] = $code;
+                }
+            }
+
+            foreach (\Plugins::all() as $plugin) {
+                /**
+                 * @var \modules\push\Protocol $protocol
+                 */
+                $protocol = parent::getProtocol($plugin);
+                foreach ($protocol?->getCodes() ?? [] as $code) {
+                    self::$_codes[$code->getCode(true)] = $code;
+                }
+            }
         }
-        return self::$_codes[$component->getType() . '@' . $component->getName() . '@' . $code];
+
+        return array_values(self::$_codes);
     }
 
     /**

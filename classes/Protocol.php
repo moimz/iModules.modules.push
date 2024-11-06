@@ -7,13 +7,13 @@
  * @file /modules/push/classes/Protocol.php
  * @author Arzz <arzz@arzz.com>
  * @license MIT License
- * @modified 2024. 10. 14.
+ * @modified 2024. 11. 5.
  */
 namespace modules\push;
 class Protocol extends \Protocol
 {
     /**
-     * 전체 알림종류를 가져온다.
+     * 전체 알림코드를 가져온다.
      *
      * @return \modules\push\dtos\Code[] $codes
      */
@@ -23,10 +23,10 @@ class Protocol extends \Protocol
     }
 
     /**
-     * 회원 및 알림종류별 기본 알림수신채널을 가져온다.
+     * 회원 및 알림코드별 기본 알림수신채널을 가져온다.
      *
      * @param int $member_id 기본설정을 가져올 회원고유값 (0 인 경우 비회원으로 기본 설정 사용)
-     * @param string $code 알림종류
+     * @param string $code 알림코드
      * @return string[] $channels 수신채널 (WEB, SMS, EMAIL)
      */
     public function getChannels(int $member_id, string $code): array

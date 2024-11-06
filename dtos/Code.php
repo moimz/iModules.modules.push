@@ -7,7 +7,7 @@
  * @file /modules/push/dtos/Code.php
  * @author Arzz <arzz@arzz.com>
  * @license MIT License
- * @modified 2024. 10. 14.
+ * @modified 2024. 11. 5.
  */
 namespace modules\push\dtos;
 class Code
@@ -18,9 +18,9 @@ class Code
     private \Component $_component;
 
     /**
-     * @var string $_code 알림종류
+     * @var string $_code 알림코드
      */
-    private \Component $_code;
+    private string $_code;
 
     /**
      * @var ?string $_title 알림명
@@ -36,7 +36,7 @@ class Code
      * 알림종류 구조체를 정의한다.
      *
      * @param \Component $component 알림을 보내는 컴포넌트객체
-     * @param string $code 알림종류
+     * @param string $code 알림코드
      * @param string $title 알림명
      */
     public function __construct(\Component $component, string $code)
@@ -46,13 +46,27 @@ class Code
     }
 
     /**
-     * 알림종류를 가져온다.
+     * 알림코드를 가져온다.
      *
+     * @param bool $is_component 컴포넌트종류 및 컴포넌트명을 포함한 코드를 가져올지 여부
      * @return string $code
      */
-    public function getCode(): string
+    public function getCode(bool $is_component = false): string
     {
+        if ($is_component == true) {
+            return $this->_component->getType() . '@' . $this->_component->getName() . '@' . $this->_code;
+        }
         return $this->_code;
+    }
+
+    /**
+     * 컴포넌트를 가져온다.
+     *
+     * @return \Component $component
+     */
+    public function getComponent(): \Component
+    {
+        return $this->_component;
     }
 
     /**
