@@ -7,7 +7,7 @@
  * @file /modules/push/Push.php
  * @author Arzz <arzz@arzz.com>
  * @license MIT License
- * @modified 2024. 10. 14.
+ * @modified 2024. 11. 6.
  */
 namespace modules\push;
 class Push extends \Module
@@ -20,13 +20,84 @@ class Push extends \Module
     /**
      * @var \modules\push\dtos\Code[] $_codes 알림종류
      */
-    private static array $_codes = [];
+    private static array $_codes;
 
     /**
      * 모듈을 설정을 초기화한다.
      */
     public function init(): void
     {
+    }
+
+    /**
+     * 모듈의 컨텍스트 목록을 가져온다.
+     *
+     * @return array $contexts 컨텍스트목록
+     */
+    public function getContexts(): array
+    {
+        $contexts = [];
+        foreach ($this->getText('contexts') as $name => $title) {
+            $contexts[] = ['name' => $name, 'title' => $title];
+        }
+        return $contexts;
+    }
+
+    /**
+     * 컨텍스트를 가져온다.
+     *
+     * @param string $context 컨텍스트명
+     * @param ?object $configs 컨텍스트 설정
+     * @return string $html
+     */
+    public function getContext(string $context, ?object $configs = null): string
+    {
+        /**
+         * 컨텍스트 템플릿을 설정한다.
+         */
+        if (isset($configs?->template) == true && $configs->template->name !== '#') {
+            $this->setTemplate($configs->template);
+        } else {
+            $this->setTemplate($this->getConfigs('template'));
+        }
+
+        $content = '';
+        switch ($context) {
+            case 'settings':
+                $content = $this->getSettingsContext($configs);
+                break;
+
+            default:
+                $content = \ErrorHandler::get(\ErrorHandler::error('NOT_FOUND_URL'));
+        }
+
+        return $this->getTemplate()->getLayout($content);
+    }
+
+    /**
+     * 알림설정 컨텍스트를 가져온다.
+     *
+     * @param object $configs
+     * @return string $html
+     */
+    public function getSettingsContext($configs = null): string
+    {
+        /**
+         * 컨텍스트 템플릿을 설정한다.
+         */
+        if (isset($configs?->template) == true && $configs->template->name !== '#') {
+            $this->setTemplate($configs->template);
+        } else {
+            $this->setTemplate($this->getConfigs('template'));
+        }
+
+        $codes = $this->getCodes();
+        $template = $this->getTemplate();
+        $template->assign('codes', $codes);
+
+        $header = $footer = '';
+
+        return $template->getContext('settings', $header, $footer);
     }
 
     /**
